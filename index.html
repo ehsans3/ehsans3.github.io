@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <h1>Narrative Visualization Project - Summer 2024</h1>
+    <h2>Global Video Game Sales (1985 - 2015) </h2>
+    <div id = "brief">
+    <p> The narrative visualization is designed as an engaging and interactive slideshow, providing a comprehensive overview of the global sales of video games from 1985 to 2015.<br> This visualization delves into the sales performance across key markets, including North America, Europe, and Japan, enabling users to explore trends and patterns in each region.<br>
+    Please use slide buttons to navigate the video game sales for North America, Europe and Japan.</p>
+    <div>
+
+<style>
+	.line {fill: none; stroke: red; stroke-width: 3;}
+ 	.dot:hover {fill: white; stroke: blue;} 
+    body {
+		background-color: rgb(255, 245, 235);
+        margin-left:5%;
+        margin-right:5%;
+        margin-bottom:5%;
+    }
+    .myYaxis {font: 15px calibri;}
+    .myXaxis {font: 15px calibri;}
+    .label {font: 16px calibri;}    
+    #source_div {
+		font: 10px Verdana;
+		width: 500px;
+		height: 30px;
+    }
+    #brief {
+     font: 16px Georgia;
+    }
+	h3 {
+		color:#461E64;
+        font-family:verdana;
+    }
+
+
+</style>
+
+<!-- Load d3.js and d3-annotation -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+
+
+<p>Button Selection:   
+	<button onclick="scene1(data1)">North America</button>
+	<button onclick="scene2(data2)">Europe</button>
+	<button onclick="scene3(data3)">Japan</button>
+</p>
+
+<div id = "message_div">
+    <p id = "message" style="font: 16px Georgia; color: #632D09"></p>
+</div>
+
+<!-- Create a div where the graph will take place -->
+<div id="Line_chart"></div>
+
+<script>
+// Code cite reference: https://d3-graph-gallery.com/line.html
+// Game sale project datasets (data1: North America, data2: Europe, data3: Japan)
+var data1 = [
+   {year: 1985, sale: 33.73, market: "NA"},
+   {year: 1986, sale: 12.5,  market: "NA"},
+   {year: 1987, sale: 8.46,  market: "NA"},
+   {year: 1988, sale: 23.87, market: "NA"},
+   {year: 1989, sale: 45.15, market: "NA"},
+   {year: 1990, sale: 25.46, market: "NA"},
+   {year: 1991, sale: 12.76, market: "NA"},
+   {year: 1992, sale: 33.87, market: "NA"},
+   {year: 1993, sale: 15.12, market: "NA"},
+   {year: 1994, sale: 28.15, market: "NA"},
+   {year: 1995, sale: 24.82, market: "NA"},
+   {year: 1996, sale: 86.76, market: "NA"},
+   {year: 1997, sale: 94.75, market: "NA"},
+   {year: 1998, sale: 128.36, market: "NA"},
+   {year: 1999, sale: 126.06, market: "NA"},
+   {year: 2000, sale: 94.49, market: "NA"},
+   {year: 2001, sale: 173.98, market: "NA"},
+   {year: 2002, sale: 216.19, market: "NA"},
+   {year: 2003, sale: 193.59, market: "NA"},
+   {year: 2004, sale: 222.59, market: "NA"},
+   {year: 2005, sale: 242.61, market: "NA"},
+   {year: 2006, sale: 263.12, market: "NA"},
+   {year: 2007, sale: 312.05, market: "NA"},
+   {year: 2008, sale: 351.44, market: "NA"},
+   {year: 2009, sale: 338.85, market: "NA"},
+   {year: 2010, sale: 304.24, market: "NA"},
+   {year: 2011, sale: 241.06, market: "NA"},
+   {year: 2012, sale: 154.96, market: "NA"},
+   {year: 2013, sale: 154.77, market: "NA"},
+   {year: 2014, sale: 131.97, market: "NA"},
+   {year: 2015, sale: 102.82, market: "NA"},  
+];
+
+var data2 = [
+   {year: 1985, sale: 4.74, market: "EU"},
+   {year: 1986, sale: 2.84, market: "EU"},
+   {year: 1987, sale: 1.41, market: "EU"},
+   {year: 1988, sale: 6.59, market: "EU"},
+   {year: 1989, sale: 8.44, market: "EU"},
+   {year: 1990, sale: 7.63, market: "EU"},
+   {year: 1991, sale: 3.95, market: "EU"},
+   {year: 1992, sale: 11.71, market: "EU"},
+   {year: 1993, sale: 4.65, market: "EU"},
+   {year: 1994, sale: 14.88, market: "EU"},
+   {year: 1995, sale: 14.9, market: "EU"},
+   {year: 1996, sale: 47.26, market: "EU"},
+   {year: 1997, sale: 48.32, market: "EU"},
+   {year: 1998, sale: 66.9, market: "EU"},
+   {year: 1999, sale: 62.67, market: "EU"},
+   {year: 2000, sale: 52.75, market: "EU"},
+   {year: 2001, sale: 94.89, market: "EU"},
+   {year: 2002, sale: 109.74, market: "EU"},
+   {year: 2003, sale: 103.81, market: "EU"},
+   {year: 2004, sale: 107.32, market: "EU"},
+   {year: 2005, sale: 121.94, market: "EU"},
+   {year: 2006, sale: 129.24, market: "EU"},
+   {year: 2007, sale: 160.5,  market: "EU"},
+   {year: 2008, sale: 184.4,  market: "EU"},
+   {year: 2009, sale: 191.59, market: "EU"},
+   {year: 2010, sale: 176.73, market: "EU"},
+   {year: 2011, sale: 167.44, market: "EU"},
+   {year: 2012, sale: 118.78, market: "EU"},
+   {year: 2013, sale: 125.8,  market: "EU"},
+   {year: 2014, sale: 125.65, market: "EU"},
+   {year: 2015, sale: 97.71,  market: "EU"},
+];
+
+var data3 = [
+   {year: 1985, sale: 14.56, market: "JP"},
+   {year: 1986, sale: 19.81, market: "JP"},
+   {year: 1987, sale: 11.63, market: "JP"},
+   {year: 1988, sale: 15.76, market: "JP"},
+   {year: 1989, sale: 18.36, market: "JP"},
+   {year: 1990, sale: 14.88, market: "JP"},
+   {year: 1991, sale: 14.78, market: "JP"},
+   {year: 1992, sale: 28.91, market: "JP"},
+   {year: 1993, sale: 25.33, market: "JP"},
+   {year: 1994, sale: 33.99, market: "JP"},
+   {year: 1995, sale: 45.75, market: "JP"},
+   {year: 1996, sale: 57.44, market: "JP"},
+   {year: 1997, sale: 48.87, market: "JP"},
+   {year: 1998, sale: 50.04, market: "JP"},
+   {year: 1999, sale: 52.34, market: "JP"},
+   {year: 2000, sale: 42.77, market: "JP"},
+   {year: 2001, sale: 39.86, market: "JP"},
+   {year: 2002, sale: 41.76, market: "JP"},
+   {year: 2003, sale: 34.2,  market: "JP"},
+   {year: 2004, sale: 41.65, market: "JP"},
+   {year: 2005, sale: 54.28, market: "JP"},
+   {year: 2006, sale: 73.73, market: "JP"},
+   {year: 2007, sale: 60.29, market: "JP"},
+   {year: 2008, sale: 60.26, market: "JP"},
+   {year: 2009, sale: 61.89, market: "JP"},
+   {year: 2010, sale: 59.49, market: "JP"},
+   {year: 2011, sale: 53.04, market: "JP"},
+   {year: 2012, sale: 51.74, market: "JP"},
+   {year: 2013, sale: 47.59, market: "JP"},
+   {year: 2014, sale: 39.46, market: "JP"},
+   {year: 2015, sale: 33.72, market: "JP"},
+];
+
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 30, bottom: 50, left: 50},
+    width = 900 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#Line_chart")
+  .append("svg")
+	.attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+// Initialise a X axis:
+var x = d3.scaleLinear().range([0,width]);
+var xAxis = d3.axisBottom().scale(x);
+svg.append("g")
+  .attr("transform", "translate(0," + height + ")")
+  .attr("class","myXaxis")
+	svg.append("text")
+		.attr("transform", "translate(" + width/2 + "," + (height+margin.bottom - 10) + ")")
+		.attr("class","label")
+		.style("text-anchor", "middle")  // center text    
+		.text("Year")
+
+// Initialize an Y axis
+var y = d3.scaleLinear().range([height, 0]);
+var yAxis = d3.axisLeft().scale(y);
+svg.append("g")
+   .attr("class","myYaxis")
+	svg.append("text")
+		.attr("transform", "translate(" + -1*margin.left + "," + -1*margin.top/2 + ")")
+		.attr("class","label")
+		.style("text-anchor", "start")  
+		.text("Sales (Million)")
+
+// Title for graph   
+svg.append("text")
+	.attr("x", (width / 2))             
+	.attr("y", 0 - (margin.top / 2))
+	.attr("text-anchor", "middle") 
+	.style("font-size", "15px") 
+	.style("text-decoration", "underline")  
+	.text("Game Sale vs Year");   
+
+// Create a function for scene1:
+function scene1(data) {
+	d3.select(".annotations").remove()
+    // create a tooltip
+    var Tooltip = d3.select("#Line_chart")
+       .append("div")
+       .style("opacity", 0)
+       .attr("class", "tooltip")       
+       .style("position", "absolute")
+       .style("background-color", "white")
+       .style("border", "3px solid #ccc")
+       .style("padding", "10px")
+       .style("font-family", "system-ui")
+
+      // Three function that change the tooltip when user hover / move / leave a cell
+      var mouseover = function(d) {
+        Tooltip
+          .style("opacity", 1)
+      }
+      var mousemove = function(d) {
+        Tooltip
+          .html(`Sale: ${d.sale}<br>Year: ${d.year}<br>Market: ${d.market}`)
+          .style("left", (d3.mouse(this)[0]+20) + "px")
+          .style("top", (d3.mouse(this)[1])+275 + "px")
+      }
+      var mouseleave = function(d) {
+        Tooltip
+          .style("opacity", 0)
+      }
+
+	// Create the X axis:
+	x.domain(d3.extent(data, function(d) { return d.year; }));
+	svg.selectAll(".myXaxis").transition()
+		.duration(100)
+		.call(xAxis);
+
+	// Create the Y axis
+	y.domain([0, d3.max(data, function(d) { return d.sale  }) ]);
+	svg.selectAll(".myYaxis")
+		.transition()
+		.duration(100)
+		.call(yAxis);
+
+	// Create a update selection
+	var lines = svg.selectAll(".line")
+		.data([data], function(d){ return d.year });
+
+	// Updata the line
+    lines
+		.enter()
+		.append("path")
+		.attr("class","line")
+		.merge(lines)
+		.transition()
+		.duration(100)
+		.attr("d", d3.line()
+			.x(function(d) { return x(d.year); })
+			.y(function(d) { return y(d.sale); }))
+
+	var dots = svg.selectAll(".dot")
+		.data(data, function(d){ return d.year });
+
+	// Updata the dots
+    dots
+		.enter()
+		.append("circle")
+		.attr("class","dot")
+		.merge(dots)
+		.attr("cx", function(d) { return x(d.year); })
+		.attr("cy", function(d) { return y(d.sale); })
+		.attr("r", 6)
+		.attr("stroke", "green")
+		.attr("stroke-width", 2)
+		.attr("fill", "lightblue")
+		.on("mouseover", mouseover)
+		.on("mousemove", mousemove)
+		.on("mouseleave", mouseleave)
+    ; 
+    
+        const annotations = [
+          {
+            note: {
+              title: "Peak of Sale (2008)(351.44MM)"
+               },
+            x: 629,
+            y: 0,
+            dy: 10,
+            dx: -100
+            },
+              {
+            note: {
+              title: "Lowest Sale (1987)(8.46MM)"
+               },
+            x: 54,
+            y: 506,
+            dy: -80,
+            dx: 20
+               }].map(function(d){ d.color = "blue"; return d})
+        
+        const makeAnnotations = d3.annotation()
+            .type(d3.annotationLabel)
+            .annotations(annotations)
+                
+        svg.append("g")
+            .attr("class", "annotation-group")
+            .attr('id',"alexcat")
+            .call(makeAnnotations)
+      
+        document.getElementById("message").innerHTML = "<h3>North America:</h3> North America held the record for the largest video game sales. In 1985, game sales reached 33.73 million units and have gradually increased each year.<br> Sales peaked at 351.44 million units in 2008 but have declined since then.";	
+}
+
+// Create a function for scene2:
+function scene2(data) {
+	d3.select(".annotations").remove()
+    // create a tooltip
+    var Tooltip = d3.select("#Line_chart")
+       .append("div")
+       .style("opacity", 0)
+       .attr("class", "tooltip")       
+       .style("position", "absolute")
+       .style("background-color", "white")
+       .style("border", "3px solid #ccc")
+       .style("padding", "10px")
+       .style("font-family", "system-ui")
+
+      // Three function that change the tooltip when user hover / move / leave a cell
+      var mouseover = function(d) {
+        Tooltip
+          .style("opacity", 1)
+      }
+      var mousemove = function(d) {
+        Tooltip
+          .html(`Sale: ${d.sale}<br>Year: ${d.year}<br>Market: ${d.market}`)
+          .style("left", (d3.mouse(this)[0]+20) + "px")
+          .style("top", (d3.mouse(this)[1])+270 + "px")
+      }
+      var mouseleave = function(d) {
+        Tooltip
+          .style("opacity", 0)
+      }
+
+	// Create the X axis:
+	x.domain(d3.extent(data, function(d) { return d.year; }));
+	svg.selectAll(".myXaxis").transition()
+		.duration(100)
+		.call(xAxis);
+
+	// Create the Y axis
+	y.domain([0, d3.max(data, function(d) { return d.sale  }) ]);
+	svg.selectAll(".myYaxis")
+		.transition()
+		.duration(100)
+		.call(yAxis);
+
+	// Create a update selection: bind to the new data
+	var lines = svg.selectAll(".line")
+		.data([data], function(d){ return d.year });
+
+	// Updata the line
+    lines
+		.enter()
+		.append("path")
+		.attr("class","line")
+		.merge(lines)
+		.transition()
+		.duration(100)
+		.attr("d", d3.line()
+			.x(function(d) { return x(d.year); })
+			.y(function(d) { return y(d.sale); }))
+
+	var dots = svg.selectAll(".dot")
+		.data(data, function(d){ return d.year });
+
+	// Updata the dots
+    dots
+		.enter()
+		.append("circle")
+		.attr("class","dot")
+		.merge(dots)
+		.attr("cx", function(d) { return x(d.year); })
+		.attr("cy", function(d) { return y(d.sale); })
+		.attr("r", 6)
+		.attr("stroke", "green")
+		.attr("stroke-width", 2)
+		.attr("fill", "lightblue")
+		.on("mouseover", mouseover)
+		.on("mousemove", mousemove)
+		.on("mouseleave", mouseleave)
+    ; 
+    
+        const annotations = [
+          {
+            note: {
+              title: "Peak of Sale (2009)(191.59MM)"
+               },
+            x: 655,
+            y: 0,
+            dy: 30,
+            dx: -120
+            },
+            {
+            note: {
+              title: "Lowest Sale (1987)(1.41MM)"
+               },
+            x: 54,
+            y: 516,
+            dy: -80,
+            dx: 20
+               }].map(function(d){ d.color = "blue"; return d})
+        
+        const makeAnnotations = d3.annotation()
+            .type(d3.annotationLabel)
+            .annotations(annotations)
+                
+        svg.append("g")
+            .attr("class", "annotation-group")
+            .attr('id',"alexcat")
+            .call(makeAnnotations)
+
+        document.getElementById("message").innerHTML = "<h3>Europe:</h3> Europe had the lowest game sales in the 1980s compared to other regions. For instance, in 1987, only 1.41 million units were sold. However, sales began to increase in the late 1990s.<br> Game sales in Europe peaked in 2009 at 191.59 million units but have declined since then.";	
+}
+
+// Create a function for scene3:
+function scene3(data) {
+	d3.select(".annotations").remove()
+    // create a tooltip
+    var Tooltip = d3.select("#Line_chart")
+       .append("div")
+       .style("opacity", 0)
+       .attr("class", "tooltip")       
+       .style("position", "absolute")
+       .style("background-color", "white")
+       .style("border", "3px solid #ccc")
+       .style("padding", "10px")
+       .style("font-family", "system-ui")
+
+      // Three function that change the tooltip when user hover / move / leave a cell
+      var mouseover = function(d) {
+        Tooltip
+          .style("opacity", 1)
+      }
+      var mousemove = function(d) {
+        Tooltip
+          .html(`Sale: ${d.sale}<br>Year: ${d.year}<br>Market: ${d.market}`)
+          .style("left", (d3.mouse(this)[0]+20) + "px")
+          .style("top", (d3.mouse(this)[1])+275 + "px")
+      }
+      var mouseleave = function(d) {
+        Tooltip
+          .style("opacity", 0)
+      }
+
+	// Create the X axis:
+	x.domain(d3.extent(data, function(d) { return d.year; }));
+	svg.selectAll(".myXaxis").transition()
+		.duration(100)
+		.call(xAxis);
+
+	// Create the Y axis
+	y.domain([0, d3.max(data, function(d) { return d.sale  }) ]);
+	svg.selectAll(".myYaxis")
+		.transition()
+		.duration(100)
+		.call(yAxis);
+
+	// Create a update selection: bind to the new data
+	var lines = svg.selectAll(".line")
+		.data([data], function(d){ return d.year });
+
+	// Updata the line
+    lines
+		.enter()
+		.append("path")
+		.attr("class","line")
+		.merge(lines)
+		.transition()
+		.duration(100)
+		.attr("d", d3.line()
+			.x(function(d) { return x(d.year); })
+			.y(function(d) { return y(d.sale); }))
+
+	var dots = svg.selectAll(".dot")
+		.data(data, function(d){ return d.year });
+
+	// Updata the dots
+    dots
+		.enter()
+		.append("circle")
+		.attr("class","dot")
+		.merge(dots)
+		.attr("cx", function(d) { return x(d.year); })
+		.attr("cy", function(d) { return y(d.sale); })
+		.attr("r", 6)
+		.attr("stroke", "green")
+		.attr("stroke-width", 2)
+		.attr("fill", "lightblue")
+		.on("mouseover", mouseover)
+		.on("mousemove", mousemove)
+		.on("mouseleave", mouseleave)
+    ; 
+   
+		const annotations = [
+          {
+            note: {
+              title: "Peak of Sale (2006)(73.73MM)"
+               },
+            x: 575,
+            y: 0,
+            dy: 30,
+            dx: -120
+            },
+            {
+            note: {
+              title: "Lowest Sale (1987)(11.63MM)"
+               },
+            x: 55,
+            y: 437,
+            dy: -80,
+            dx: 20
+               }].map(function(d){ d.color = "blue"; return d})
+        
+		const makeAnnotations = d3.annotation()
+			.type(d3.annotationLabel)
+			.annotations(annotations)
+                
+        svg.append("g")
+            .attr("class", "annotation-group")
+            .attr('id',"alexcat")
+            .call(makeAnnotations)
+         
+        document.getElementById("message").innerHTML = "<h3>Japan:</h3>In the late 1980s, Japan sold more games than Europe and had comparable sales to North America. Japan's sales were more consistent compared to other regions. For instance,<br> the lowest sales record was in 1987 with 11.63 million units, which was higher than in other markets. Their highest sales record was 73.73 million units in 2006. However, like other markets, sales have declined since then.";	
+}
+// When start the webpage, run and visuliaze the first dataset:
+scene1(data1)
+
+</script>
+
+<div id = "source_div">
+    <p>
+        Data Source: https://www.kaggle.com/datasets/thedevastator/global-video-game-sales
+    </p>
+</div>
+</body>
+</html>
